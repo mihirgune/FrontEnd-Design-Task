@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';  
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './Dashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -9,6 +11,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const Dashboard = ({ setAuth }) => {
   const [alerts, setAlerts] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(''); // Added searchTerm state
   const username = localStorage.getItem('username');
   const navigate = useNavigate();
 
@@ -56,7 +59,7 @@ const Dashboard = ({ setAuth }) => {
     Critical: 'red',
   };
 
-  // Random color fallback for any undefined severity level
+  // Function to generate a random hex color
   const getRandomColor = () => {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -85,8 +88,6 @@ const Dashboard = ({ setAuth }) => {
     },
   };
 
-
-
   // Sort severities based on the defined order
   const sortedSeverities = Object.keys(severitySummary).sort((a, b) => {
     const indexA = severityOrder.indexOf(a);
@@ -98,6 +99,12 @@ const Dashboard = ({ setAuth }) => {
     
     return indexA - indexB; // Sort by defined order
   });
+
+  // Filter alerts based on search term
+  const filteredAlerts = alerts.filter(alert =>
+    alert.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    alert.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className={`dashboard ${menuOpen ? 'menu-open' : ''}`}>
@@ -170,10 +177,24 @@ const Dashboard = ({ setAuth }) => {
           </div>
         </div>
 
+        {/* Search Container */}
+        <div className="search-container">
+          <div className="search-wrapper">
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search by name or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
         {/* Alerts Table */}
-        {alerts.length > 0 ? (
+        {filteredAlerts.length > 0 ? (
           <div className="alerts-table">
-            <h2>Alerts</h2>
+            {/* <h2>Alerts</h2> */}
             <table>
               <thead>
                 <tr>
@@ -185,7 +206,7 @@ const Dashboard = ({ setAuth }) => {
                 </tr>
               </thead>
               <tbody>
-                {alerts.map((alert) => (
+                {filteredAlerts.map((alert) => (
                   <tr key={alert.id}>
                     <td>{alert.id}</td>
                     <td>{alert.name}</td>
@@ -201,7 +222,7 @@ const Dashboard = ({ setAuth }) => {
           </div>
         ) : (
           <div className="no-alerts">
-            <p>To start, upload a CSV file with your log data.</p>
+            <p>No alerts found. To start, upload a CSV file with your log data.</p>
           </div>
         )}
       </div>
@@ -210,3 +231,5 @@ const Dashboard = ({ setAuth }) => {
 };
 
 export default Dashboard;
+
+// npm install react-chartjs-2 chart.js
