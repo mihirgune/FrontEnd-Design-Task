@@ -202,8 +202,38 @@ th, td {
 }
 
 th {
+  position: relative;
+  padding: 0.5rem;
+}
+
+.sort-icon {
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+  padding: 0.2rem; /* Add padding to the icon */
+}
+
+.sorting-arrow {
+  padding: 0 5px;
+  display: inline-flex; /* Use inline-flex to center the icon */
+  align-items: center; /* Center vertically */
+}
+
+/* Style for the active arrow */
+.active-arrow {
+  color: #666; /* Normal color for the active arrow */
+}
+
+/* Style for the inactive arrow (light color) */
+.inactive-arrow {
+  color: #bbb; /* Light color for the inactive arrow */
+}
+
+th {
+  font-weight: normal;
+}
+
+th.sorting {
   font-weight: bold;
-  background-color: #f4f4f4;
 }
 
 tbody tr:hover {

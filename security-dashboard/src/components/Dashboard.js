@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';  
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faArrowUp,faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import './Dashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -14,6 +14,9 @@ const Dashboard = ({ setAuth }) => {
   const [searchTerm, setSearchTerm] = useState(''); // Added searchTerm state
   const username = localStorage.getItem('username');
   const navigate = useNavigate();
+  const [sortField, setSortField] = useState('id'); // Default sort field
+  const [sortOrder, setSortOrder] = useState('asc'); // Default sort order
+
 
   useEffect(() => {
     fetchAlerts();
@@ -106,6 +109,17 @@ const Dashboard = ({ setAuth }) => {
     alert.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const sortAlerts = (alerts) => {
+    return alerts.sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+  const sortedAlerts = sortAlerts(filteredAlerts);
+
   return (
     <div className={`dashboard ${menuOpen ? 'menu-open' : ''}`}>
       {/* Top bar with alerts section */}
@@ -194,27 +208,60 @@ const Dashboard = ({ setAuth }) => {
         {/* Alerts Table */}
         {filteredAlerts.length > 0 ? (
           <div className="alerts-table">
-            {/* <h2>Alerts</h2> */}
-            <table>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Name</th>
+                  <th
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (sortField === 'id') {
+                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortField('id');
+                        setSortOrder('asc');
+                      }
+                      setSortField('id'); // Ensure sortField is set to 'id' when clicked
+                    }}
+                  >
+                    ID
+                    {sortField === 'id' && (
+                      <FontAwesomeIcon
+                        icon={sortOrder === 'asc' ? faArrowUp : faArrowDown}
+                        className="active-arrow"
+                      />
+                    )}
+                  </th>
+                  <th
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (sortField === 'name') {
+                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortField('name');
+                        setSortOrder('asc');
+                      }
+                      setSortField('name'); // Ensure sortField is set to 'name' when clicked
+                    }}
+                  >
+                    Name
+                    {sortField === 'name' && (
+                      <FontAwesomeIcon
+                        icon={sortOrder === 'asc' ? faArrowUp : faArrowDown}
+                        className="active-arrow"
+                      />
+                    )}
+                  </th>
                   <th>Severity</th>
                   <th>Description</th>
-                  <th>More Info</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredAlerts.map((alert) => (
+                {sortedAlerts.map((alert) => (
                   <tr key={alert.id}>
                     <td>{alert.id}</td>
                     <td>{alert.name}</td>
                     <td>{alert.severity}</td>
                     <td>{alert.description}</td>
-                    <td>
-                      <Link to={`/alert/${alert.id}`}>More Info</Link>
-                    </td>
                   </tr>
                 ))}
               </tbody>
