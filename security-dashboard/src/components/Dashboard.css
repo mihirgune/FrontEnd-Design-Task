@@ -1,8 +1,11 @@
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 .dashboard {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  font-family: Arial, sans-serif;
   transition: margin-left 0.3s; /* Smooth transition for main content */
 }
 
@@ -153,6 +156,28 @@
   transition: margin-left 0.3s; /* Smooth transition for main content */
 }
 
+.title {
+  text-align: left;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: black !important;
+}
+
+
+.summary {
+  margin: 1rem 0;
+  text-align: center;
+  /* border: 1px solid #ccc; */
+  /* border-radius: 5px; */
+  padding: 1rem;
+  background-color: white;
+}
+
+.summary h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
 .alerts-table {
   margin-top: 1rem;
 }
@@ -202,12 +227,6 @@ tbody tr:hover {
 
 .upload-button:hover {
   background-color: #0056b3;
-}
-
-.title {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 1rem;
 }
 
 .no-alerts {
