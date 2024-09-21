@@ -83,6 +83,7 @@ const Dashboard = ({ setAuth }) => {
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
+                  <th>Severity</th>
                   <th>Description</th>
                   <th>More Info</th>
                 </tr>
@@ -92,6 +93,7 @@ const Dashboard = ({ setAuth }) => {
                   <tr key={alert.id}>
                     <td>{alert.id}</td>
                     <td>{alert.name}</td>
+                    <td>{alert.severity}</td>
                     <td>{alert.description}</td>
                     <td>
                       <Link to={`/alert/${alert.id}`}>More Info</Link>
