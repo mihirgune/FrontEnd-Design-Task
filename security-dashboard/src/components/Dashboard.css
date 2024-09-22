@@ -1,76 +1,31 @@
 .dashboard {
   font-family: 'Optimistic Display', -apple-system, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  height: 100vh;
+  background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  transition: margin-left 0.3s;
-}
-
-.menu-open .main-content {
-  margin-left: 130px;
 }
 
 .top-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  background-color: #f0f0f0;
-  padding: 0.5rem 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
-.left-section {
+.profile-section {
   display: flex;
   align-items: center;
-}
-
-.middle-section {
-  flex: 1;
-}
-
-.right-section {
-  display: flex;
-  align-items: center;
-}
-
-.menu-toggle {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.menu-icon {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 20px;
-}
-
-.menu-line {
-  width: 20px;
-  height: 2px;
-  background-color: black;
-}
-
-.triangle {
-  width: 0;
-  height: 0;
-  border-top: 15px solid transparent;
-  border-bottom: 15px solid transparent;
-  margin-right: 10px;
-}
-
-.triangle-left {
-  border-right: 15px solid #f0f0f0;
 }
 
 .user-info {
   display: flex;
-  align-items: center;
-  padding: 1rem;
-  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
 }
-
 .user-photo {
   width: 40px;
   height: 40px;
@@ -82,54 +37,30 @@
   background-position: center;
 }
 
+
 .user-name {
   font-weight: bold;
-  color: white;
+  color: #333;
 }
 
 .sign-out {
-  cursor: pointer;
   color: #007bff;
-}
-
-.side-menu {
-  position: absolute;
-  left: -130px;
-  top: 0;
-  height: 100%;
-  width: 130px;
-  background-color: #333;
-  transition: left 0.3s ease-in-out;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.side-menu.open {
-  left: 0;
-}
-
-.collapse-arrow-container {
-  position: absolute;
-  top: 50%;
-  right: -10px;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
   cursor: pointer;
+  font-size: 0.85rem;
 }
 
 .main-content {
-  flex: 1;
-  padding: 1rem;
-  transition: margin-left 0.3s;
+  padding: 2rem;
+  flex-grow: 1;
+  background-color: white;
+  margin-top: 2px;
 }
 
 .alerts-title {
-  text-align: left;
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: black !important;
+  font-size: 4rem;
+  margin-top: 2px;
+  margin-bottom: 20px;
+  color: #343a40;
 }
 
 .summary {
@@ -142,6 +73,99 @@
 .summary h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
+}
+.chart-container {
+  width: 45%;
+}
+
+.severity-table {
+  width: 45%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+th {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+td a {
+  color: #007bff; /* Default link color */
+}
+
+td a:hover {
+  text-decoration: underline;
+  color: darkblue;
+}
+
+tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.sort-icon {
+  margin-left: 5px;
+  transition: font-weight 0.3s ease;
+  vertical-align: middle; /* Aligns the icons vertically */
+}
+
+.sort-icon.active {
+  color: black; /* Bold style when active */
+}
+
+.sort-icon.inactive {
+  color: grey; /* Color for inactive arrows */
+  font-weight: normal; /* Ensure non-active icons are normal weight */
+}
+
+.custom-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  max-width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 10px 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 100%;
+  margin-left: 5px;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.severity-color {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
 }
 
 .search-container {
@@ -178,81 +202,8 @@
   box-sizing: border-box;
 }
 
-.alerts-table {
-  margin-top: 1rem;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-thead {
-  background-color: #f8f8f8;
-}
-
-th, td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.sort-icon {
-  font-size: 0.75rem;
-  margin-left: 0.5rem;
-  padding: 0.2rem; /* Add padding to the icon */
-}
-
-.sorting-arrow {
-  padding: 0 5px;
-  display: inline-flex; /* Use inline-flex to center the icon */
-  align-items: center; /* Center vertically */
-}
-
-/* Style for the active arrow */
-.active-arrow {
-  color: #666; /* Normal color for the active arrow */
-}
-
-/* Style for the inactive arrow (light color) */
-.inactive-arrow {
-  color: #bbb; /* Light color for the inactive arrow */
-}
-
-th {
-  font-weight: normal;
-}
-
-th.sorting {
-  font-weight: bold;
-}
-
-tbody tr:hover {
-  background-color: #f1f1f1;
-}
-
-.upload-button {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-decoration: none;
-  text-align: center;
-}
-
-.upload-button:hover {
-  background-color: #0056b3;
-}
-
 .no-alerts {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
+  color: #6c757d;
+  margin-top: 2rem;
 }
