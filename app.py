@@ -206,7 +206,32 @@ def get_alerts():
     except SQLAlchemyError as e:
         response = jsonify({'error': str(e)}), 400
 
-        return response  
+        return response
+
+@app.route('/api/paginated_alerts/<int:pageNumber>', methods=['GET'])
+def get_paginated_alerts(pageNumber):
+    global uploadCount
+
+    # Create the alert list for the specified pag
+    try:
+        if uploadCount > 1:
+            alerts_per_page = 10
+            start_index = pageNumber * alerts_per_page
+            end_index = start_index + alerts_per_page
+            alerts = Alert.query.with_entities(Alert.id, Alert.name, Alert.description, Alert.severity).all()
+            alert_list = [
+                {'id': alert.id, 'name': alert.name, 'description': alert.description, 'severity': alert.severity}
+                for alert in alerts[start_index:end_index]
+            ]
+        else:
+            alert_list = []
+
+        response = jsonify({'alerts': alert_list}), 200
+        return response
+    except SQLAlchemyError as e:
+        response = jsonify({'error': str(e)}), 400
+
+        return response
 
 @app.route('/alert/<int:alert_id>', methods=['GET'])
 def get_alert(alert_id):

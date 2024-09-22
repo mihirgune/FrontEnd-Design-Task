@@ -6,8 +6,7 @@ import { Rnd } from 'react-rnd';
 import './NetworkPage.css';
 import uuid from "react-uuid";
 
-const NetworkPage = () => {
-  const { alertId } = useParams();
+const NetworkPage = ({alertId}) => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -182,41 +181,41 @@ const NetworkPage = () => {
   };
 
   return (
-    <div className="network-container">
-      <button className="toggle-button" onClick={toggleTransparentEdges}>
-        {showTransparent ? "Hide Transparent Edges" : "Show Transparent Edges"}
-      </button>
-      <div id="network-visualization">
-        <Graph
-          key={uuid()}
-          graph={graphData}
-          options={options}
-          events={{ 
-            selectNode: handleNodeClick,
-            selectEdge: handleEdgeClick
-          }}
-        />
-        {clickedEdge && clickedEdge.alname && (
-          <Rnd default={{ x: 50, y: 50, width: 250, height: 150 }} bounds="parent">
-            <div className="popup popup-edge">
-              <button className="close-button" onClick={handleClosePopup}>X</button>
-              <p>Alert: {clickedEdge.alname}</p>
-            </div>
-          </Rnd>
-        )}
-        {clickedNode && clickedNode.nodes && (
-          <Rnd default={{ x: 150, y: 150, width: 300, height: 200 }} bounds="parent">
-            <div className="popup popup-node scrollable-popup">
-              <button className="close-button" onClick={handleClosePopup}>X</button>
-              <p>Names:</p>
-              {clickedNode.nodes.map((name, index) => (
-                <p key={index}>{name}</p>
-              ))}
-            </div>
-          </Rnd>
-        )}
+      <div className="network-container">
+        <div id="network-visualization">
+          <Graph
+              key={uuid()}
+              graph={graphData}
+              options={options}
+              events={{
+                selectNode: handleNodeClick,
+                selectEdge: handleEdgeClick
+              }}
+          />
+          {clickedEdge && clickedEdge.alname && (
+              <Rnd default={{x: 50, y: 50, width: 250, height: 150}} bounds="parent">
+                <div className="popup popup-edge">
+                  <button className="close-button" onClick={handleClosePopup}>X</button>
+                  <p>Alert: {clickedEdge.alname}</p>
+                </div>
+              </Rnd>
+          )}
+          {clickedNode && clickedNode.nodes && (
+              <Rnd default={{x: 150, y: 150, width: 300, height: 200}} bounds="parent">
+                <div className="popup popup-node scrollable-popup">
+                  <button className="close-button" onClick={handleClosePopup}>X</button>
+                  <p>Names:</p>
+                  {clickedNode.nodes.map((name, index) => (
+                      <p key={index}>{name}</p>
+                  ))}
+                </div>
+              </Rnd>
+          )}
+        </div>
+        <button className="toggle-button" onClick={toggleTransparentEdges}>
+          {showTransparent ? "Hide Transparent Edges" : "Show Transparent Edges"}
+        </button>
       </div>
-    </div>
   );
 };
 

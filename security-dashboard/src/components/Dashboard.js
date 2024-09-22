@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Doughnut } from 'react-chartjs-2';  
+import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronUp, faChevronDown, faFilter} from '@fortawesome/free-solid-svg-icons';
@@ -19,10 +19,21 @@ const Dashboard = ({ setAuth }) => {
 
   const username = localStorage.getItem('username');
   const navigate = useNavigate();
+  const [pageNumber, setPageNumber] = useState(0);
+
 
   useEffect(() => {
-    fetchAlerts();
-  }, []);
+    fetchAlerts(pageNumber);
+  }, [pageNumber]);
+
+  const handleNextPage = () => {
+    setPageNumber((prev) => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+        console.log("handlePreviousPage called");
+        setPageNumber((prev) => Math.max(prev - 1, -1)); // Prevent going to a negative page number
+    };
 
   useEffect(() => {
     filterAlerts();
@@ -30,7 +41,7 @@ const Dashboard = ({ setAuth }) => {
 
   const fetchAlerts = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/alert');
+      const response = await fetch(`http://127.0.0.1:5000/api/paginated_alerts/${pageNumber}`); // Replace with your backend endpoint
       if (!response.ok) {
         throw new Error('Failed to fetch alerts');
       }
@@ -55,7 +66,7 @@ const Dashboard = ({ setAuth }) => {
 
   const severityOrder = ['Critical', 'High', 'Medium', 'Low'];
   const severityColors = {
-    Low: '#FFC000', 
+    Low: '#FFC000',
     Medium: '#F08000',
     High: 'orangered',
     Critical: 'red',
@@ -150,32 +161,38 @@ const Dashboard = ({ setAuth }) => {
       <div className="main-content">
         <h1 className="alerts-title">Alerts</h1>
 
-        <div className="summary" style={{ display: 'flex', flexDirection: 'row', width: '50%', padding: '1rem' }}>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ textAlign: 'left' }}>Severity Levels</h2>
-            <div style={{ width: '100%', height: '300px' }}>
-              <Doughnut data={chartData} options={chartOptions} />
+        <div className="summary" style={{display: 'flex', flexDirection: 'row', width: '50%', padding: '1rem'}}>
+          <div style={{flex: 1}}>
+            <h2 style={{textAlign: 'left'}}>Severity Levels</h2>
+            <div style={{width: '100%', height: '300px'}}>
+              <Doughnut data={chartData} options={chartOptions}/>
             </div>
           </div>
 
-          <div style={{ flex: 1, marginLeft: '1rem', fontSize: '0.85rem' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+          <div style={{flex: 1, marginLeft: '1rem', fontSize: '0.85rem'}}>
+            <table style={{width: '100%', borderCollapse: 'collapse', marginTop: '1rem'}}>
               <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '0.25rem' }}>Severity</th>
-                  <th style={{ textAlign: 'left', padding: '0.25rem' }}>Count</th>
-                </tr>
+              <tr>
+                <th style={{textAlign: 'left', padding: '0.25rem'}}>Severity</th>
+                <th style={{textAlign: 'left', padding: '0.25rem'}}>Count</th>
+              </tr>
               </thead>
               <tbody>
-                {sortedSeverities.map((severity) => (
+              {sortedSeverities.map((severity) => (
                   <tr key={severity}>
-                    <td style={{ padding: '0.25rem' }}>
-                      <span style={{ display: 'inline-block', width: '10px', height: '10px', backgroundColor: severityColors[severity] || getRandomColor(), marginRight: '0.5rem' }}></span>
+                    <td style={{padding: '0.25rem'}}>
+                      <span style={{
+                        display: 'inline-block',
+                        width: '10px',
+                        height: '10px',
+                        backgroundColor: severityColors[severity] || getRandomColor(),
+                        marginRight: '0.5rem'
+                      }}></span>
                       {severity}
                     </td>
-                    <td style={{ padding: '0.25rem' }}>{severitySummary[severity]}</td>
+                    <td style={{padding: '0.25rem'}}>{severitySummary[severity]}</td>
                   </tr>
-                ))}
+              ))}
               </tbody>
             </table>
           </div>
@@ -183,118 +200,126 @@ const Dashboard = ({ setAuth }) => {
 
         <div className="search-container">
           <div className="search-wrapper">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            <FontAwesomeIcon icon={faSearch} className="search-icon"/>
             <input
-              type="text"
-              className="search-input"
-              placeholder="Search by name or description..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+                type="text"
+                className="search-input"
+                placeholder="Search by name or description..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
             />
+          </div>
+          <div className="pagination-controls">
+            <button onClick={handlePreviousPage} disabled={pageNumber === 0}>
+              Previous
+            </button>
+            <button onClick={handleNextPage}>
+              Next
+            </button>
           </div>
         </div>
 
         {filteredAlerts.length > 0 ? (
-          <div className="alerts-table">
-            <table>
-              <thead>
+            <div className="alerts-table">
+              <table>
+                <thead>
                 <tr>
-                  <th style={{ width: '10%', textAlign: 'left' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <th style={{width: '10%', textAlign: 'left'}}>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
                       ID
-                      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '5px', alignItems: 'center' }}>
+                      <div style={{display: 'flex', flexDirection: 'column', marginLeft: '5px', alignItems: 'center'}}>
                         <FontAwesomeIcon
-                          icon={faChevronUp}
-                          className={`sort-icon ${sortField === 'id' && sortOrder === 'asc' ? 'active' : 'inactive'}`}
-                          onClick={() => {
-                            if (sortField === 'id') {
-                              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                            } else {
-                              setSortField('id');
-                              setSortOrder('asc');
-                            }
-                          }}
+                            icon={faChevronUp}
+                            className={`sort-icon ${sortField === 'id' && sortOrder === 'asc' ? 'active' : 'inactive'}`}
+                            onClick={() => {
+                              if (sortField === 'id') {
+                                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                              } else {
+                                setSortField('id');
+                                setSortOrder('asc');
+                              }
+                            }}
                         />
                         <FontAwesomeIcon
-                          icon={faChevronDown}
-                          className={`sort-icon ${sortField === 'id' && sortOrder === 'desc' ? 'active' : 'inactive'}`}
-                          onClick={() => {
-                            if (sortField === 'id') {
-                              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                            } else {
-                              setSortField('id');
-                              setSortOrder('desc');
-                            }
-                          }}
+                            icon={faChevronDown}
+                            className={`sort-icon ${sortField === 'id' && sortOrder === 'desc' ? 'active' : 'inactive'}`}
+                            onClick={() => {
+                              if (sortField === 'id') {
+                                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                              } else {
+                                setSortField('id');
+                                setSortOrder('desc');
+                              }
+                            }}
                         />
                       </div>
                     </div>
                   </th>
-                  <th style={{ width: '15%', textAlign: 'left' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <th style={{width: '15%', textAlign: 'left'}}>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
                       Name
-                      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '5px', alignItems: 'center' }}>
+                      <div style={{display: 'flex', flexDirection: 'column', marginLeft: '5px', alignItems: 'center'}}>
                         <FontAwesomeIcon
-                          icon={faChevronUp}
-                          className={`sort-icon ${sortField === 'name' && sortOrder === 'asc' ? 'active' : 'inactive'}`}
-                          onClick={() => {
-                            if (sortField === 'name') {
-                              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                            } else {
-                              setSortField('name');
-                              setSortOrder('asc');
-                            }
-                          }}
+                            icon={faChevronUp}
+                            className={`sort-icon ${sortField === 'name' && sortOrder === 'asc' ? 'active' : 'inactive'}`}
+                            onClick={() => {
+                              if (sortField === 'name') {
+                                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                              } else {
+                                setSortField('name');
+                                setSortOrder('asc');
+                              }
+                            }}
                         />
                         <FontAwesomeIcon
-                          icon={faChevronDown}
-                          className={`sort-icon ${sortField === 'name' && sortOrder === 'desc' ? 'active' : 'inactive'}`}
-                          onClick={() => {
-                            if (sortField === 'name') {
-                              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                            } else {
-                              setSortField('name');
-                              setSortOrder('desc');
-                            }
-                          }}
+                            icon={faChevronDown}
+                            className={`sort-icon ${sortField === 'name' && sortOrder === 'desc' ? 'active' : 'inactive'}`}
+                            onClick={() => {
+                              if (sortField === 'name') {
+                                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                              } else {
+                                setSortField('name');
+                                setSortOrder('desc');
+                              }
+                            }}
                         />
                       </div>
                     </div>
                   </th>
-                  <th style={{ width: '15%', textAlign: 'left' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <th style={{width: '15%', textAlign: 'left'}}>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
                       Severity
                       <FontAwesomeIcon
-                        icon={faFilter}
-                        className={`filter-icon ${isFiltered ? 'active' : ''}`}
-                        onClick={isFiltered ? handleFilterReset : null} // Reset filter on click if active
+                          icon={faFilter}
+                          className={`filter-icon ${isFiltered ? 'active' : ''}`}
+                          onClick={isFiltered ? handleFilterReset : null} // Reset filter on click if active
                       />
                     </div>
                   </th>
-                  <th style={{ width: '60%', textAlign: 'left' }}>Description</th>
+                  <th style={{width: '60%', textAlign: 'left'}}>Description</th>
                 </tr>
-              </thead>
-              <tbody>
+                </thead>
+                <tbody>
                 {sortedAlerts.map((alert) => (
-                  <tr key={alert.id}>
-                    <td style={{ width: '10%' }}>
-                      <Link to={`/alert/${alert.id}`} className="custom-tooltip">
-                        {alert.id}
-                        <span className="tooltip-text">Click for more info on this alert.</span>
-                      </Link>
-                    </td>
-                    <td style={{ width: '15%' }}>{alert.name}</td>
-                    <td style={{ width: '15%' }}>{alert.severity}</td>
-                    <td style={{ width: '60%' }}>{alert.description}</td>
-                  </tr>
+                    <tr key={alert.id} style={{backgroundColor: alert.id % 2 === 0 ? 'white' : '#f8f8f8', cursor: 'pointer'}}>
+                      <td style={{width: '10%'}}>
+                        <Link to={`/alert/${alert.id}`} className="custom-tooltip">
+                          {alert.id}
+                          <span className="tooltip-text">Click for more info on this alert.</span>
+                        </Link>
+                      </td>
+                      <td style={{width: '15%'}}>{alert.name}</td>
+                      <td style={{width: '15%'}}>{alert.severity}</td>
+                      <td style={{width: '60%'}}>{alert.description}</td>
+                    </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
+                </tbody>
+              </table>
+            </div>
         ) : (
-          <div className="no-alerts">
-            <p>No alerts found.</p>
-          </div>
+            <div className="no-alerts">
+              <p>No alerts found.</p>
+            </div>
         )}
       </div>
     </div>
