@@ -128,6 +128,17 @@ tbody tr:hover {
   font-weight: normal; /* Ensure non-active icons are normal weight */
 }
 
+.filter-icon {
+  margin-left: 5px;
+  color: grey; /* Default color */
+  cursor: pointer;
+  transition: color 0.3s ease; /* Smooth transition */
+}
+
+.filter-icon.active {
+  color: black; /* Active color when filtered */
+}
+
 .custom-tooltip {
   position: relative;
   display: inline-block;

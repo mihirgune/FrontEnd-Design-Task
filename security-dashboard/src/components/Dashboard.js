@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';  
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faChevronUp, faChevronDown, faFilter} from '@fortawesome/free-solid-svg-icons';
 import './Dashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -15,6 +15,7 @@ const Dashboard = ({ setAuth }) => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [filteredAlerts, setFilteredAlerts] = useState([]);
   const [selectedSeverity, setSelectedSeverity] = useState(null);
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const username = localStorage.getItem('username');
   const navigate = useNavigate();
@@ -91,8 +92,14 @@ const Dashboard = ({ setAuth }) => {
         const clickedIndex = elements[0].index;
         const clickedSeverity = severityOrder[clickedIndex];
         setSelectedSeverity(clickedSeverity);
+        setIsFiltered(true);
       }
     },
+  };
+
+  const handleFilterReset = () => {
+    setSelectedSeverity(null); // Reset severity filter
+    setIsFiltered(false); // Reset filter state
   };
 
   const sortedSeverities = Object.keys(severitySummary).sort((a, b) => {
@@ -254,7 +261,16 @@ const Dashboard = ({ setAuth }) => {
                       </div>
                     </div>
                   </th>
-                  <th style={{ width: '15%', textAlign: 'left' }}>Severity</th>
+                  <th style={{ width: '15%', textAlign: 'left' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      Severity
+                      <FontAwesomeIcon
+                        icon={faFilter}
+                        className={`filter-icon ${isFiltered ? 'active' : ''}`}
+                        onClick={isFiltered ? handleFilterReset : null} // Reset filter on click if active
+                      />
+                    </div>
+                  </th>
                   <th style={{ width: '60%', textAlign: 'left' }}>Description</th>
                 </tr>
               </thead>
