@@ -1,7 +1,5 @@
-body {
-  font-family: 'Roboto', sans-serif;
-}
 .login-page {
+  font-family: 'Optimistic Display', -apple-system, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   background-color: lightgray;
   padding: 2.5rem;
   display: flex;
@@ -27,9 +25,10 @@ body {
 }
 
 .title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  padding-bottom: 2rem;
   color: white;
+  text-align: center;
 }
 
 form {

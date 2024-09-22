@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Doughnut } from 'react-chartjs-2';  
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faArrowUp,faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import './Dashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -11,16 +11,22 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const Dashboard = ({ setAuth }) => {
   const [alerts, setAlerts] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(''); // Added searchTerm state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('id');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [filteredAlerts, setFilteredAlerts] = useState([]);
+  const [selectedSeverity, setSelectedSeverity] = useState(null); // State to track selected severity
+
   const username = localStorage.getItem('username');
   const navigate = useNavigate();
-  const [sortField, setSortField] = useState('id'); // Default sort field
-  const [sortOrder, setSortOrder] = useState('asc'); // Default sort order
-
 
   useEffect(() => {
     fetchAlerts();
   }, []);
+
+  useEffect(() => {
+    filterAlerts();
+  }, [searchTerm, selectedSeverity]);
 
   const fetchAlerts = async () => {
     try {
@@ -30,6 +36,7 @@ const Dashboard = ({ setAuth }) => {
       }
       const data = await response.json();
       setAlerts(data.alerts);
+      setFilteredAlerts(data.alerts); // Initialize filtered alerts
     } catch (error) {
       console.error('Error fetching alerts:', error);
     }
@@ -51,10 +58,8 @@ const Dashboard = ({ setAuth }) => {
     return acc;
   }, {});
 
-  // Define the order of severity levels
   const severityOrder = ['Critical', 'High', 'Medium', 'Low'];
 
-  // Assigning colors based on severity
   const severityColors = {
     Low: '#FFC000', 
     Medium: '#F08000',
@@ -62,7 +67,6 @@ const Dashboard = ({ setAuth }) => {
     Critical: 'red',
   };
 
-  // Function to generate a random hex color
   const getRandomColor = () => {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -82,6 +86,7 @@ const Dashboard = ({ setAuth }) => {
     }],
   };
 
+  // Chart options with onClick handler
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -89,25 +94,37 @@ const Dashboard = ({ setAuth }) => {
         display: false,
       },
     },
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        const clickedIndex = elements[0].index;
+        const clickedSeverity = severityOrder[clickedIndex];
+        setSelectedSeverity(clickedSeverity); // Set selected severity
+      }
+    },
   };
 
-  // Sort severities based on the defined order
+  // Sort severities
   const sortedSeverities = Object.keys(severitySummary).sort((a, b) => {
     const indexA = severityOrder.indexOf(a);
     const indexB = severityOrder.indexOf(b);
-    
-    if (indexA === -1 && indexB === -1) return 0; // Both are unknown
-    if (indexA === -1) return 1; // 'a' is unknown
-    if (indexB === -1) return -1; // 'b' is unknown
-    
-    return indexA - indexB; // Sort by defined order
+    return indexA - indexB;
   });
 
-  // Filter alerts based on search term
-  const filteredAlerts = alerts.filter(alert =>
-    alert.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    alert.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter alerts by search term and selected severity
+  const filterAlerts = () => {
+    let filtered = alerts;
+    if (selectedSeverity) {
+      filtered = filtered.filter(alert => alert.severity === selectedSeverity);
+    }
+    if (searchTerm) {
+      filtered = filtered.filter(
+        alert =>
+          alert.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          alert.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    setFilteredAlerts(filtered);
+  };
 
   const sortAlerts = (alerts) => {
     return alerts.sort((a, b) => {
@@ -118,11 +135,11 @@ const Dashboard = ({ setAuth }) => {
       return 0;
     });
   };
+
   const sortedAlerts = sortAlerts(filteredAlerts);
 
   return (
     <div className={`dashboard ${menuOpen ? 'menu-open' : ''}`}>
-      {/* Top bar with alerts section */}
       <div className="top-bar">
         <div className="left-section">
           <div className="menu-toggle" onClick={toggleMenu}>
@@ -134,7 +151,6 @@ const Dashboard = ({ setAuth }) => {
             </div>
           </div>
         </div>
-        <div className="middle-section"></div>
         <div className="right-section">
           <div className="sign-out" onClick={handleLogout}>
             Sign Out
@@ -142,7 +158,6 @@ const Dashboard = ({ setAuth }) => {
         </div>
       </div>
 
-      {/* Side menu */}
       <div className={`side-menu ${menuOpen ? 'open' : ''}`}>
         <div className="user-info">
           <div className="user-photo"></div>
@@ -153,16 +168,12 @@ const Dashboard = ({ setAuth }) => {
         </div>
       </div>
 
-      {/* Main content */}
       <div className="main-content">
-        <h1 className="title">Alerts</h1>
+        <h1 className="alerts-title">Alerts</h1>
 
-        {/* Summary Section with Bounded Donut Chart and Table */}
         <div className="summary" style={{ display: 'flex', flexDirection: 'row', width: '50%', padding: '1rem' }}>
           <div style={{ flex: 1 }}>
             <h2 style={{ textAlign: 'left' }}>Severity Levels</h2>
-
-            {/* Donut Chart */}
             <div style={{ width: '100%', height: '300px' }}>
               <Doughnut data={chartData} options={chartOptions} />
             </div>
@@ -191,7 +202,6 @@ const Dashboard = ({ setAuth }) => {
           </div>
         </div>
 
-        {/* Search Container */}
         <div className="search-container">
           <div className="search-wrapper">
             <FontAwesomeIcon icon={faSearch} className="search-icon" />
@@ -205,14 +215,13 @@ const Dashboard = ({ setAuth }) => {
           </div>
         </div>
 
-        {/* Alerts Table */}
         {filteredAlerts.length > 0 ? (
           <div className="alerts-table">
             <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
               <thead>
                 <tr>
                   <th
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer'}}
                     onClick={() => {
                       if (sortField === 'id') {
                         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -220,14 +229,13 @@ const Dashboard = ({ setAuth }) => {
                         setSortField('id');
                         setSortOrder('asc');
                       }
-                      setSortField('id'); // Ensure sortField is set to 'id' when clicked
                     }}
                   >
                     ID
                     {sortField === 'id' && (
                       <FontAwesomeIcon
                         icon={sortOrder === 'asc' ? faArrowUp : faArrowDown}
-                        className="active-arrow"
+                        className="sort-icon"
                       />
                     )}
                   </th>
@@ -240,14 +248,13 @@ const Dashboard = ({ setAuth }) => {
                         setSortField('name');
                         setSortOrder('asc');
                       }
-                      setSortField('name'); // Ensure sortField is set to 'name' when clicked
                     }}
                   >
                     Name
                     {sortField === 'name' && (
                       <FontAwesomeIcon
                         icon={sortOrder === 'asc' ? faArrowUp : faArrowDown}
-                        className="active-arrow"
+                        className="sort-icon"
                       />
                     )}
                   </th>
@@ -258,8 +265,10 @@ const Dashboard = ({ setAuth }) => {
               <tbody>
                 {sortedAlerts.map((alert) => (
                   <tr key={alert.id}>
-                    <td>{alert.id}</td>
-                    <td>{alert.name}</td>
+                    <td style={{ color: '#007bff' }}>
+                      <Link to={`/alert/${alert.id}`}>{alert.id}</Link>
+                    </td>
+                    <td style={{ fontWeight: 500 }}>{alert.name}</td>
                     <td>{alert.severity}</td>
                     <td>{alert.description}</td>
                   </tr>
@@ -269,7 +278,7 @@ const Dashboard = ({ setAuth }) => {
           </div>
         ) : (
           <div className="no-alerts">
-            <p>No alerts found. To start, upload a CSV file with your log data.</p>
+            <p>No alerts found.</p>
           </div>
         )}
       </div>
@@ -278,5 +287,3 @@ const Dashboard = ({ setAuth }) => {
 };
 
 export default Dashboard;
-
-// npm install react-chartjs-2 chart.js

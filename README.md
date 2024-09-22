@@ -10,6 +10,11 @@ Navigate to the `security-dashboard` folder and run:
 npm install
 ```
 
+```bash
+npm install --save @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons
+npm install react-chartjs-2 chart.js
+```
+
 ### 2. Set Up Python Environment
 In the base project folder (not inside `security-dashboard`), create and activate a virtual Python environment:
 

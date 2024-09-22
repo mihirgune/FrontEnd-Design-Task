@@ -1,8 +1,5 @@
-body {
-  font-family: 'Roboto', sans-serif;
-}
-
 .create-user-page {
+  font-family: 'Optimistic Display', -apple-system, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   background-color: lightgray;
   padding: 2.5rem;
   display: flex;
