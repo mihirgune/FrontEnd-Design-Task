@@ -58,6 +58,7 @@ input {
   cursor: pointer;
   top: 50%;
   transform: translateY(-50%);
+  padding-bottom: 18px;
 }
 
 .eye-icon {
